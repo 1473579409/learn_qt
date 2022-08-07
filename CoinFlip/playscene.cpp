@@ -7,6 +7,7 @@
 #include <QLabel>
 #include "mycoin.h"
 #include "dataconfig.h"
+#include <QPropertyAnimation>
 
 //PlayScene::PlayScene(QWidget *parent)
 //    : QMainWindow{parent}
@@ -82,6 +83,15 @@
             this->gameArray[i][j] = config.mData[this->levelIndex][i][j];
         }
     }
+
+    //胜利图片显示 -- 放在显示屏幕的上方，等待下落弹跳的时机(用户看不到)
+    QLabel * winLabel = new QLabel;
+    QPixmap tmpPix;
+    tmpPix.load(":/res/LevelCompletedDialogBg.png");
+    winLabel->setGeometry(0,0,tmpPix.width(),tmpPix.height());
+    winLabel->setPixmap(tmpPix);
+    winLabel->setParent(this);
+    winLabel->move ((this->width()-tmpPix.width())*0.5,-tmpPix.height());
 
     //显示金币背景图案
     //创建金币的背景图片
@@ -177,6 +187,19 @@
                                 coinBtn[i][j]->isWin = true;
                             }
                         }
+
+                        //将胜利图片移动下来
+                        QPropertyAnimation * animation = new QPropertyAnimation(winLabel,"geometry");
+                        //设置时间间隔
+                        animation->setDuration(1000);
+                        //设置开始位置
+                        animation->setStartValue(QRect(winLabel->x(),winLabel->y(),winLabel->width(),winLabel->height()));
+                        //设置结束位置
+                        animation->setEndValue(QRect(winLabel->x(),winLabel->y()+114,winLabel->width(),winLabel->height()));
+                        //设置缓和曲线
+                        animation->setEasingCurve(QEasingCurve::OutBounce);
+                        //执行动画
+                        animation->start();
                     }
                 });
             });
